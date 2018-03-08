@@ -167,14 +167,23 @@ public class ThreadPoolmplTest {
         }
     }
 
+    /**
+     * Checks that if task will never end, shutDown will kill it
+     */
+    @Test
+    public void shutDownTest() throws Exception {
+        ThreadPoolmpl<Integer> pool = new ThreadPoolmpl<>(5);
+        LightFuture<Integer> task = pool.addTask(() -> {
+            while (true) {
+            }
+        });
+        Thread.sleep(100);
+        pool.shutDown();
+    }
+
     private Supplier<Integer> taskThrowsNullPointerException = () -> {
         String nullString = null;
         return nullString.length();
-    };
-
-    private Supplier<Integer> taskThrowsArrayIndexOutOfBoundsException = () -> {
-        int[] a = new int[43];
-        return a[43];
     };
 
     private Supplier<Integer> sleepingTask = () -> {

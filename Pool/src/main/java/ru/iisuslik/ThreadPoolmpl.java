@@ -1,5 +1,7 @@
 package ru.iisuslik;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -39,7 +41,7 @@ public class ThreadPoolmpl<T> {
      * @return Special class that implements LightFuture, from it you can check that task is finished
      * or get task's result
      */
-    public synchronized LightFuture<T> addTask(Supplier<T> task) {
+    public synchronized LightFuture<T> addTask(@NotNull Supplier<T> task) {
         SupplierTask newTask = new SupplierTask(task);
         addTask(newTask);
         return newTask;
@@ -57,7 +59,6 @@ public class ThreadPoolmpl<T> {
     private synchronized void addTask(Task task) {
         tasksQueue.add(task);
         this.notify();
-        System.err.println("New task has added");
     }
 
     private class RunnableForThreads implements Runnable {
@@ -69,7 +70,6 @@ public class ThreadPoolmpl<T> {
                         while (tasksQueue.isEmpty()) {
                             ThreadPoolmpl.this.wait();
                         }
-                        System.err.println(Thread.currentThread().getName() + " take free task");
                         Task task = tasksQueue.get(0);
                         tasksQueue.remove(0);
                         task.runTask();
@@ -81,9 +81,9 @@ public class ThreadPoolmpl<T> {
     }
 
     private class Task implements LightFuture<T> {
-        protected boolean isReady = false;
-        protected T result;
-        protected Exception getException = null;
+        boolean isReady = false;
+        T result;
+        Exception getException = null;
 
         /**
          * {@link LightFuture<T>#isReady()}
@@ -104,7 +104,6 @@ public class ThreadPoolmpl<T> {
                 }
             } catch (InterruptedException ignored) {
             }
-            System.err.println("Izi task get");
             if (getException != null) {
                 LightExecutionException e = new LightExecutionException();
                 e.addSuppressed(getException);
@@ -117,7 +116,7 @@ public class ThreadPoolmpl<T> {
          * {@link LightFuture<T>#thenApply(Function)}
          */
         @Override
-        public LightFuture<T> thenApply(Function<T, T> func) {
+        public LightFuture<T> thenApply(@NotNull Function<T, T> func) {
             Task task = new FunctionTask(this, func);
             synchronized (task) {
                 addTask(task);
@@ -133,20 +132,18 @@ public class ThreadPoolmpl<T> {
     private class SupplierTask extends Task {
         private Supplier<T> func;
 
-        private SupplierTask(Supplier<T> func) {
+        private SupplierTask(@NotNull Supplier<T> func) {
             this.func = func;
         }
 
         @Override
         public synchronized void runTask() {
-            System.err.println("Run supplier task");
             try {
                 result = func.get();
             } catch (Exception e) {
                 getException = e;
             }
             isReady = true;
-            System.err.println(Thread.currentThread().getName() + " izi task");
             notifyAll();
         }
     }
@@ -157,7 +154,6 @@ public class ThreadPoolmpl<T> {
 
         @Override
         public synchronized void runTask() {
-            System.err.println("Run function task");
             try {
                 synchronized (parent) {
                     while (!parent.isReady()) {
@@ -169,14 +165,13 @@ public class ThreadPoolmpl<T> {
                         getException = e;
                     }
                     isReady = true;
-                    System.err.println(Thread.currentThread().getName() + " izi task");
                     notifyAll();
                 }
             } catch (InterruptedException ignored) {
             }
         }
 
-        private FunctionTask(Task parent, Function<T, T> func) {
+        private FunctionTask(@NotNull Task parent, @NotNull Function<T, T> func) {
             this.func = func;
             this.parent = parent;
         }

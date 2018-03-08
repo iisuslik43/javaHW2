@@ -1,5 +1,7 @@
 package ru.iisuslik;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.function.Function;
 
 /**
@@ -31,5 +33,5 @@ public interface LightFuture<T> {
      * @param func Function that will calculate returning LightFuture
      * @return Task with Function inside
      */
-    LightFuture<T> thenApply(Function<T, T> func);
+    LightFuture<T> thenApply(@NotNull Function<T, T> func);
 }
