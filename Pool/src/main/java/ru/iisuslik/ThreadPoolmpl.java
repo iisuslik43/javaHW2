@@ -80,7 +80,7 @@ public class ThreadPoolmpl<T> {
         }
     }
 
-    private class Task implements LightFuture<T> {
+    private abstract class Task implements LightFuture<T> {
         boolean isReady = false;
         T result;
         Exception getException = null;
@@ -118,14 +118,11 @@ public class ThreadPoolmpl<T> {
         @Override
         public LightFuture<T> thenApply(@NotNull Function<T, T> func) {
             Task task = new FunctionTask(this, func);
-            synchronized (task) {
-                addTask(task);
-                return task;
-            }
+            addTask(task);
+            return task;
         }
 
-        public synchronized void runTask() {
-        }
+        public abstract void runTask();
 
     }
 
