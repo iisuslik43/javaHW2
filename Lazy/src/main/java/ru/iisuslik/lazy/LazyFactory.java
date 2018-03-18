@@ -14,22 +14,20 @@ public class LazyFactory {
      * Returns class that implements Lazy interface
      *
      * @param function Supplier that will be called
-     * @param <T> Typ of supplier return value
+     * @param <T>      Typ of supplier return value
      * @return New Lazy from supplier
      */
     public static <T> Lazy<T> createLazy(@NotNull Supplier<T> function) {
         return new Lazy<T>() {
             private Supplier<T> func = function;
             private T result;
+
             @Override
             public T get() {
-                if(func == null)
+                if (func == null)
                     return result;
-                if(result == null) {
-                    result = func.get();
-                    if(result == null)
-                        func = null;
-                }
+                result = func.get();
+                func = null;
                 return result;
             }
         };
@@ -40,21 +38,23 @@ public class LazyFactory {
      * It uses "synchronized" so it can work slower
      *
      * @param function Supplier that will be called
-     * @param <T> Typ of supplier return value
+     * @param <T>      Typ of supplier return value
      * @return New Lazy from supplier
      */
-    public static <T> Lazy<T> createLazySafe(@NotNull Supplier<T> function){
+    public static <T> Lazy<T> createLazySafe(@NotNull Supplier<T> function) {
         return new Lazy<T>() {
             private Supplier<T> func = function;
             private T result;
+
             @Override
-            public synchronized T get() {
-                if(func == null)
+            public T get() {
+                if (func == null)
                     return result;
-                if(result == null) {
-                    result = func.get();
-                    if(result == null)
+                synchronized (this) {
+                    if (func != null) {
+                        result = func.get();
                         func = null;
+                    }
                 }
                 return result;
             }

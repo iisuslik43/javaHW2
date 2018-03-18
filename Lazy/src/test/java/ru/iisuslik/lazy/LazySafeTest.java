@@ -75,7 +75,7 @@ public class LazySafeTest {
      */
     @Test
     public void manyThreadsOneTask() throws Exception {
-        for(int j = 0; j < 50; j++) {
+        for (int j = 0; j < 50; j++) {
             Lazy<Integer> task = LazyFactory.createLazySafe(new SupplierWithCount());
             Runnable forThreads = task::get;
             Thread[] threads = new Thread[16];
@@ -88,7 +88,7 @@ public class LazySafeTest {
             for (Thread thread : threads) {
                 thread.join();
             }
-            assertEquals(1, (int)task.get());
+            assertEquals(1, (int) task.get());
         }
     }
 

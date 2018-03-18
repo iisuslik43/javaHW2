@@ -16,8 +16,8 @@ public class LazyTest {
     @Test
     public void createLazy() {
         Lazy<Integer> lazy = LazyFactory.createLazy(() -> 2 + 2);
-        assertEquals(4, (int)lazy.get());
-        assertEquals(4, (int)lazy.get());
+        assertEquals(4, (int) lazy.get());
+        assertEquals(4, (int) lazy.get());
     }
 
     /**
@@ -26,8 +26,8 @@ public class LazyTest {
     @Test
     public void getHappensOnlyOneTime() {
         Lazy<Integer> strange = LazyFactory.createLazy(strangeSupplier);
-        assertEquals(43, (int)strange.get());
-        assertEquals(43, (int)strange.get());
+        assertEquals(43, (int) strange.get());
+        assertEquals(43, (int) strange.get());
     }
 
     /**
@@ -47,10 +47,11 @@ public class LazyTest {
     public void nullReturningCallOnes() {
         Lazy<Integer> returnsNull = LazyFactory.createLazy(new Supplier<Integer>() {
             private int count = 0;
+
             @Override
             public Integer get() {
-                count ++;
-                if(count > 1)
+                count++;
+                if (count > 1)
                     return 43;
                 return null;
             }
@@ -62,9 +63,10 @@ public class LazyTest {
 
     private Supplier<Integer> strangeSupplier = new Supplier<Integer>() {
         boolean getHappend = false;
+
         @Override
         public Integer get() {
-            if(getHappend)
+            if (getHappend)
                 return null;
             getHappend = true;
             return 43;
