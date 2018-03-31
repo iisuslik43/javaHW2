@@ -43,7 +43,7 @@ public class LazyFactory {
      */
     public static <T> Lazy<T> createLazySafe(@NotNull Supplier<T> function) {
         return new Lazy<T>() {
-            private Supplier<T> func = function;
+            private volatile Supplier<T> func = function;
             private T result;
 
             @Override
