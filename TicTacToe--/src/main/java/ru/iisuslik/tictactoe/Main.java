@@ -1,20 +1,12 @@
 package ru.iisuslik.tictactoe;
 
 import javafx.application.Application;
-import javafx.geometry.Insets;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.image.Image;
-import javafx.scene.layout.GridPane;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import org.jetbrains.annotations.Nullable;
-
-import java.io.File;
-
-import static ru.iisuslik.tictactoe.GameLogic.SIZE;
 
 
+/**
+ * Special class that will start at the beginning
+ */
 public class Main extends Application {
 
     @Override

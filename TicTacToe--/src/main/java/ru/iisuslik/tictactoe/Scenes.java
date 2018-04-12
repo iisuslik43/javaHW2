@@ -17,6 +17,9 @@ import java.util.ArrayList;
 
 import static ru.iisuslik.tictactoe.GameLogic.SIZE;
 
+/**
+ * Class that works with UI
+ */
 public class Scenes {
 
     private Text statisticsText;
@@ -29,6 +32,10 @@ public class Scenes {
     private ArrayList<String> statistics = new ArrayList<>();
 
 
+    /**
+     * Make new Scenes
+     * @param primaryStage Main stage
+     */
     public Scenes(Stage primaryStage) {
         this.primaryStage = primaryStage;
         initializeMainMenuScene();
