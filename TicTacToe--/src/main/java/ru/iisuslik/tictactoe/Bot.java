@@ -10,9 +10,8 @@ public interface Bot {
      * Let bot take some turn in current game
      *
      * @param game - Logic class, where turn will be saved
-     * @param main - Activity, where it will be showed
      */
-    void takeTurn(@NotNull GameLogic game, @NotNull Main main);
+    void takeTurn(@NotNull GameLogic game);
 
     /**
      * This is short bot name(Hard bot or Simple bot)

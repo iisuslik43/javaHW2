@@ -170,7 +170,7 @@ public class GameLogicTest {
         game.play(0, 0);
         game.play(2, 2);
         Pair<Integer, Integer> position = game.winPosition(Cell.X);
-        assertEquals(null, game.winPosition(Cell.O));
+        assertNull(game.winPosition(Cell.O));
         assertEquals(1, (int) position.getKey());
         assertEquals(2, (int) position.getValue());
     }
@@ -185,7 +185,7 @@ public class GameLogicTest {
         game.play(2, 2);
         game.play(0, 1);
         Pair<Integer, Integer> position = game.winPosition(Cell.O);
-        assertEquals(null, game.winPosition(Cell.X));
+        assertNull(game.winPosition(Cell.X));
         assertEquals(0, (int) position.getKey());
         assertEquals(2, (int) position.getValue());
     }
@@ -199,7 +199,7 @@ public class GameLogicTest {
         game.play(0, 2);
         game.play(2, 2);
         Pair<Integer, Integer> position = game.winPosition(Cell.X);
-        assertEquals(null, game.winPosition(Cell.O));
+        assertNull(game.winPosition(Cell.O));
         assertEquals(1, (int) position.getKey());
         assertEquals(1, (int) position.getValue());
     }
@@ -213,7 +213,7 @@ public class GameLogicTest {
         game.play(0, 0);
         game.play(2, 0);
         Pair<Integer, Integer> position = game.winPosition(Cell.X);
-        assertEquals(null, game.winPosition(Cell.O));
+        assertNull(game.winPosition(Cell.O));
         assertEquals(1, (int) position.getKey());
         assertEquals(1, (int) position.getValue());
     }

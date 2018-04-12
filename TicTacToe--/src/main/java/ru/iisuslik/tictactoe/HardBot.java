@@ -20,31 +20,31 @@ public class HardBot implements Bot {
     }
 
     /**
-     * {@link Bot#takeTurn(GameLogic, Main)}
+     * {@link Bot#takeTurn(GameLogic)}
      */
     @Override
-    public void takeTurn(@NotNull GameLogic game, @NotNull Main main) {
+    public void takeTurn(@NotNull GameLogic game) {
         if (game.isThisTheEnd())
             return;
-        if (!win(game, main) && !dontLoose(game, main)) {
-            new SimpleBot().takeTurn(game, main);
+        if (!win(game) && !dontLoose(game)) {
+            new SimpleBot().takeTurn(game);
         }
     }
 
-    private boolean win(GameLogic game, Main main) {
+    private boolean win(GameLogic game) {
         Pair<Integer, Integer> winPos = game.winPosition(game.getCurrentPlayer());
         if (winPos != null) {
-            main.pressCell(winPos.getKey(), winPos.getValue(), true);
+            game.play(winPos.getKey(), winPos.getValue());
             return true;
         }
         return false;
     }
 
-    private boolean dontLoose(GameLogic game, Main main) {
+    private boolean dontLoose(GameLogic game) {
 
         Pair<Integer, Integer> winPos = game.winPosition(game.getCurrentPlayer().getOpposit());
         if (winPos != null) {
-            main.pressCell(winPos.getKey(), winPos.getValue(), true);
+            game.play(winPos.getKey(), winPos.getValue());
             return true;
         }
         return false;

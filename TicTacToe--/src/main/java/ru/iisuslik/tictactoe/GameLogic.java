@@ -126,6 +126,22 @@ public class GameLogic {
      * @return Pair of coordinates, if win position exists, or null else
      */
     public Pair<Integer, Integer> winPosition(@NotNull Cell cell) {
+        Pair<Integer, Integer> pos = winPositionInRows(cell);
+        if(pos != null) {
+            return pos;
+        }
+        pos = winPositionInCals(cell);
+        if(pos != null) {
+            return pos;
+        }
+        pos = winPositionInMainDiagonal(cell);
+        if(pos != null) {
+            return pos;
+        }
+        return winPositionInOtherDiagonal(cell);
+    }
+
+    private Pair<Integer, Integer> winPositionInRows(Cell cell) {
         for (int i = 0; i < SIZE; i++) {
             boolean empty = false;
             int j0 = -1;
@@ -147,6 +163,10 @@ public class GameLogic {
                 return new Pair<>(i, j0);
             }
         }
+        return null;
+    }
+
+    private Pair<Integer, Integer> winPositionInCals(Cell cell) {
         for (int i = 0; i < SIZE; i++) {
             boolean empty = false;
             int j0 = -1;
@@ -168,6 +188,10 @@ public class GameLogic {
                 return new Pair<>(j0, i);
             }
         }
+        return null;
+    }
+
+    private Pair<Integer, Integer> winPositionInMainDiagonal(Cell cell) {
         boolean empty = false;
         int j0 = -1;
         for (int j = 0; j < SIZE; j++) {
@@ -187,6 +211,12 @@ public class GameLogic {
         if (empty) {
             return new Pair<>(j0, j0);
         }
+        return null;
+    }
+
+    private Pair<Integer, Integer> winPositionInOtherDiagonal(Cell cell) {
+        boolean empty = false;
+        int j0 = -1;
         for (int j = 0; j < SIZE; j++) {
             if (field[j][SIZE - 1 - j] == cell.getOpposit()) {
                 empty = false;

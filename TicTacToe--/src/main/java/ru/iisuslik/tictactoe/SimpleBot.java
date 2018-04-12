@@ -18,10 +18,10 @@ public class SimpleBot implements Bot {
     }
 
     /**
-     * {@link Bot#takeTurn(GameLogic, Main)}
+     * {@link Bot#takeTurn(GameLogic)}
      */
     @Override
-    public void takeTurn(@NotNull GameLogic game, @NotNull Main main) {
+    public void takeTurn(@NotNull GameLogic game) {
         if (game.isThisTheEnd())
             return;
         Random rand = new Random();
@@ -29,7 +29,7 @@ public class SimpleBot implements Bot {
             int i = rand.nextInt() % GameLogic.SIZE;
             int j = rand.nextInt() % GameLogic.SIZE;
             if (game.canPlay(i, j)) {
-                main.pressCell(i, j, true);
+                game.play(i, j);
                 break;
             }
         }
