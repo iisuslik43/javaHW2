@@ -18,6 +18,7 @@ public class MD5singleTest {
     public MD5singleTest() throws IOException, NoSuchAlgorithmException {
         file1Hash = MD5.getFileMD5(file1);
         file2Hash = MD5.getFileMD5(file2);
+        new File("./src/test/resources/DIRR").mkdir();
     }
 
     @Test
