@@ -8,14 +8,32 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * Client that can send to FTP server request for list files in directory or download file
+ */
 public class FTPClient {
 
-  private Socket socket;
   private DataInputStream in;
   private DataOutputStream out;
 
+  /**
+   * Create new FTP client
+   *
+   * @param host FTP server's host
+   * @param port FTP server's port
+   * @throws IOException if there are some problems with creating socket
+   */
   public FTPClient(String host, int port) throws IOException {
-    socket = new Socket(host, port);
+    this(new Socket(host, port));
+  }
+
+  /**
+   * Create new FTP client from socket, used for tests to mock
+   *
+   * @param socket socket that client will use to talk wiith server
+   * @throws IOException if there are some problems with getting streams from socket
+   */
+  public FTPClient(Socket socket) throws IOException {
     in = new DataInputStream(socket.getInputStream());
     out = new DataOutputStream(socket.getOutputStream());
   }
@@ -24,10 +42,18 @@ public class FTPClient {
     System.out.println("Sending request");
     out.writeInt(type);
     out.writeUTF(path);
+    out.flush();
     System.out.println("Stop sending");
   }
 
-  private List<FTPFile> getList(String path) throws IOException {
+  /**
+   * Send file list request to FTP server
+   *
+   * @param path directory to show
+   * @return list of files in directory
+   * @throws IOException if there are some network problems
+   */
+  public List<FTPFile> getList(String path) throws IOException {
     sendRequest(1, path);
     ArrayList<FTPFile> files = new ArrayList<>();
     int count = in.readInt();
@@ -40,7 +66,14 @@ public class FTPClient {
     return files;
   }
 
-  private byte[] getFile(String path) throws IOException {
+  /**
+   * Download file from FTP server
+   *
+   * @param path file to download
+   * @return file's bytes
+   * @throws IOException if there are some network problems
+   */
+  public byte[] getFile(String path) throws IOException {
     sendRequest(2, path);
     long size = in.readLong();
     byte[] data = new byte[(int) size];
@@ -49,6 +82,13 @@ public class FTPClient {
     return data;
   }
 
+  /**
+   * This functions starts client, print:
+   * 1 path/to/dir to list file in dir
+   * 2 path/to/file to download file
+   *
+   * @param args the first arg should be server's hostname, the second - server's port
+   */
   public static void main(String[] args) {
     FTPClient client;
     try {
@@ -78,10 +118,27 @@ public class FTPClient {
   }
 
 
+  /**
+   * Representation of file in server
+   */
   public static class FTPFile {
+
+    /**
+     * file name
+     */
     public String name;
+
+    /**
+     * It's true if file is actually a directory
+     */
     public boolean isDirectory;
 
+    /**
+     * Creates new file representation
+     *
+     * @param name file name
+     * @param isDirectory is this file a directory
+     */
     public FTPFile(String name, boolean isDirectory) {
       this.name = name;
       this.isDirectory = isDirectory;
@@ -90,6 +147,15 @@ public class FTPClient {
     @Override
     public String toString() {
       return (isDirectory ? "dir " : "file ") + name;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (o instanceof FTPFile) {
+        FTPFile other = ((FTPFile) o);
+        return name.equals(other.name) && isDirectory == other.isDirectory;
+      }
+      return false;
     }
   }
 }
