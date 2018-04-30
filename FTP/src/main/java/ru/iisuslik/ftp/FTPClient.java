@@ -1,5 +1,7 @@
 package ru.iisuslik.ftp;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -23,7 +25,7 @@ public class FTPClient {
    * @param port FTP server's port
    * @throws IOException if there are some problems with creating socket
    */
-  public FTPClient(String host, int port) throws IOException {
+  public FTPClient(@NotNull String host, int port) throws IOException {
     this(new Socket(host, port));
   }
 
@@ -33,12 +35,12 @@ public class FTPClient {
    * @param socket socket that client will use to talk wiith server
    * @throws IOException if there are some problems with getting streams from socket
    */
-  public FTPClient(Socket socket) throws IOException {
+  public FTPClient(@NotNull Socket socket) throws IOException {
     in = new DataInputStream(socket.getInputStream());
     out = new DataOutputStream(socket.getOutputStream());
   }
 
-  private void sendRequest(int type, String path) throws IOException {
+  private void sendRequest(int type, @NotNull String path) throws IOException {
     System.out.println("Sending request");
     out.writeInt(type);
     out.writeUTF(path);
@@ -53,7 +55,8 @@ public class FTPClient {
    * @return list of files in directory
    * @throws IOException if there are some network problems
    */
-  public List<FTPFile> getList(String path) throws IOException {
+  public @NotNull
+  List<FTPFile> getList(@NotNull String path) throws IOException {
     sendRequest(1, path);
     ArrayList<FTPFile> files = new ArrayList<>();
     int count = in.readInt();
@@ -73,7 +76,7 @@ public class FTPClient {
    * @return file's bytes
    * @throws IOException if there are some network problems
    */
-  public byte[] getFile(String path) throws IOException {
+  public byte[] getFile(@NotNull String path) throws IOException {
     sendRequest(2, path);
     long size = in.readLong();
     byte[] data = new byte[(int) size];
@@ -136,10 +139,10 @@ public class FTPClient {
     /**
      * Creates new file representation
      *
-     * @param name file name
+     * @param name        file name
      * @param isDirectory is this file a directory
      */
-    public FTPFile(String name, boolean isDirectory) {
+    public FTPFile(@NotNull String name, boolean isDirectory) {
       this.name = name;
       this.isDirectory = isDirectory;
     }

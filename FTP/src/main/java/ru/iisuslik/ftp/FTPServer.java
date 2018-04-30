@@ -1,5 +1,7 @@
 package ru.iisuslik.ftp;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -27,7 +29,7 @@ public class FTPServer {
    *
    * @param serverSocket socket in which server will work
    */
-  public FTPServer(ServerSocket serverSocket) {
+  public FTPServer(@NotNull ServerSocket serverSocket) {
     server = serverSocket;
   }
 
@@ -49,7 +51,7 @@ public class FTPServer {
     }
   }
 
-  private static void handleGetRequest(DataInputStream in, DataOutputStream out) throws IOException {
+  private static void handleGetRequest(@NotNull DataInputStream in, @NotNull DataOutputStream out) throws IOException {
     String path = in.readUTF();
     System.out.println("Get request to get file \"" + path + '\"');
     File file = new File(path);
@@ -69,7 +71,7 @@ public class FTPServer {
 
   }
 
-  private static void handleListRequest(DataInputStream in, DataOutputStream out) throws IOException {
+  private static void handleListRequest(@NotNull DataInputStream in, @NotNull DataOutputStream out) throws IOException {
     String path = in.readUTF();
     System.out.println("Get request to list files in directory \"" + path + '\"');
     File dir = new File(path);
@@ -89,7 +91,7 @@ public class FTPServer {
     System.out.println("Response for list request was sent");
   }
 
-  private static void handleRequests(Socket socket) {
+  private static void handleRequests(@NotNull Socket socket) {
     System.out.println("Start handling requests in thread " + Thread.currentThread().getName());
     try {
       DataInputStream in = new DataInputStream(socket.getInputStream());

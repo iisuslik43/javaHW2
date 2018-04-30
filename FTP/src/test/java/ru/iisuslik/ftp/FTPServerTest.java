@@ -1,6 +1,5 @@
 package ru.iisuslik.ftp;
 
-import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
@@ -30,7 +29,7 @@ public class FTPServerTest {
   public void listRequest() throws Exception {
     ServerSocket serverSocket = mock(ServerSocket.class);
     Socket socket = mock(Socket.class);
-    ByteOutputStream byteOut = new ByteOutputStream();
+    ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
     when(socket.getInputStream()).thenReturn(getInputStream(1, "src/test/resources/testDir"));
     when(socket.getOutputStream()).thenReturn(byteOut);
     when(socket.isConnected()).thenReturn(true).thenReturn(false);
@@ -39,7 +38,7 @@ public class FTPServerTest {
     sleep(100);
     assertEqualsLists(Arrays.asList(new FTPClient.FTPFile("testFile3", false),
         new FTPClient.FTPFile("testFile4", false)),
-        byteOut.getBytes());
+        byteOut.toByteArray());
   }
 
   /**
@@ -49,7 +48,7 @@ public class FTPServerTest {
   public void listWithDirRequest() throws Exception {
     ServerSocket serverSocket = mock(ServerSocket.class);
     Socket socket = mock(Socket.class);
-    ByteOutputStream byteOut = new ByteOutputStream();
+    ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
     when(socket.getInputStream()).thenReturn(getInputStream(1, "src/test/resources"));
     when(socket.getOutputStream()).thenReturn(byteOut);
     when(socket.isConnected()).thenReturn(true).thenReturn(false);
@@ -59,7 +58,7 @@ public class FTPServerTest {
     assertEqualsLists(Arrays.asList(new FTPClient.FTPFile("testDir", true),
         new FTPClient.FTPFile("testFile1", false),
         new FTPClient.FTPFile("testFile2", false)),
-        byteOut.getBytes());
+        byteOut.toByteArray());
   }
 
   /**
@@ -69,7 +68,7 @@ public class FTPServerTest {
   public void fileRequest() throws Exception {
     ServerSocket serverSocket = mock(ServerSocket.class);
     Socket socket = mock(Socket.class);
-    ByteOutputStream byteOut = new ByteOutputStream();
+    ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
     when(socket.getInputStream()).thenReturn(getInputStream(2, "src/test/resources/testFile1"));
     when(socket.getOutputStream()).thenReturn(byteOut);
     when(socket.isConnected()).thenReturn(true).thenReturn(false);
@@ -77,7 +76,7 @@ public class FTPServerTest {
     (new FTPServer(serverSocket)).start();
     sleep(100);
     assertEqualsFiles("Goodbye",
-        byteOut.getBytes());
+        byteOut.toByteArray());
   }
 
   /**
@@ -87,7 +86,7 @@ public class FTPServerTest {
   public void directoryDoesntExists() throws Exception {
     ServerSocket serverSocket = mock(ServerSocket.class);
     Socket socket = mock(Socket.class);
-    ByteOutputStream byteOut = new ByteOutputStream();
+    ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
     when(socket.getInputStream()).thenReturn(getInputStream(1, "src/kek"));
     when(socket.getOutputStream()).thenReturn(byteOut);
     when(socket.isConnected()).thenReturn(true).thenReturn(false);
@@ -95,7 +94,7 @@ public class FTPServerTest {
     (new FTPServer(serverSocket)).start();
     sleep(100);
     assertEqualsFiles("",
-        byteOut.getBytes());
+        byteOut.toByteArray());
   }
 
   /**
@@ -105,7 +104,7 @@ public class FTPServerTest {
   public void fileDoesntExists() throws Exception {
     ServerSocket serverSocket = mock(ServerSocket.class);
     Socket socket = mock(Socket.class);
-    ByteOutputStream byteOut = new ByteOutputStream();
+    ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
     when(socket.getInputStream()).thenReturn(getInputStream(2, "src/kek"));
     when(socket.getOutputStream()).thenReturn(byteOut);
     when(socket.isConnected()).thenReturn(true).thenReturn(false);
@@ -113,7 +112,7 @@ public class FTPServerTest {
     (new FTPServer(serverSocket)).start();
     sleep(100);
     assertEqualsFiles("",
-        byteOut.getBytes());
+        byteOut.toByteArray());
   }
 
   private InputStream getInputStream(int type, String path) throws IOException {
