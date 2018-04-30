@@ -93,7 +93,7 @@ public class FTPServerTest {
     when(serverSocket.accept()).thenReturn(socket).thenThrow(new IOException("Fake"));
     (new FTPServer(serverSocket)).start();
     sleep(100);
-    assertEqualsFiles("",
+    assertEqualsLists(Arrays.asList(),
         byteOut.toByteArray());
   }
 
