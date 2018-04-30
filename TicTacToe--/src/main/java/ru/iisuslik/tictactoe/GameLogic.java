@@ -43,7 +43,22 @@ public class GameLogic {
      * 4 game results - no result(game isn't over), X wins, O wins or draw
      */
     public enum GameResult {
-        NO_RESULT, X_WINS, O_WINS, DRAW
+        NO_RESULT, X_WINS, O_WINS, DRAW;
+
+        @Override
+        public String toString() {
+            switch (this) {
+                case X_WINS:
+                    return "X Won";
+                case O_WINS:
+                    return "O Won";
+                case DRAW:
+                    return "Draw";
+                case NO_RESULT:
+                    return "No result";
+            }
+            return "";
+        }
     }
 
     private Cell currentPlayer = Cell.X;
@@ -271,7 +286,7 @@ public class GameLogic {
         checkThatDiagIs(Cell.X);
         checkThatDiagIs(Cell.O);
         checkThatOtherDiagIs(Cell.X);
-        checkThatOtherDiagIs(Cell.X);
+        checkThatOtherDiagIs(Cell.O);
     }
 
     private void checkThatRowIs(int i, Cell cell) {

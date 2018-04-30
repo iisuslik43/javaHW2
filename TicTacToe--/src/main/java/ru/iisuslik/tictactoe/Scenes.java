@@ -4,16 +4,14 @@ import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 import static ru.iisuslik.tictactoe.GameLogic.SIZE;
 
@@ -22,18 +20,20 @@ import static ru.iisuslik.tictactoe.GameLogic.SIZE;
  */
 public class Scenes {
 
-    private Text statisticsText;
     private Bot bot;
     private Stage primaryStage;
     private Scene gameScene;
     private Scene mainMenuScene;
     private GameLogic game = new GameLogic();
     private Button[][] buttons = new Button[GameLogic.SIZE][SIZE];
-    private ArrayList<String> statistics = new ArrayList<>();
+    private ArrayList<String> hotSeatStatistics = new ArrayList<>();
+    private ArrayList<String> simpleBotStatistics = new ArrayList<>();
+    private ArrayList<String> hardBotStatistics = new ArrayList<>();
 
 
     /**
      * Make new Scenes
+     *
      * @param primaryStage Main stage
      */
     public Scenes(Stage primaryStage) {
@@ -86,28 +86,29 @@ public class Scenes {
             if (game.isThisTheEnd()) {
                 disableAll();
                 writeStatistics();
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Game Over");
-                alert.setContentText(statistics.get(statistics.size() - 1));
-                alert.setHeaderText(null);
-                alert.showAndWait();
+                showAlert("Game Over", game.getGameResult().toString());
             }
         }
     }
 
+    private void showAlert(String title, String content) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setContentText(content);
+        alert.setHeaderText(null);
+        alert.showAndWait();
+    }
+
     private void writeStatistics() {
-        if (game.getGameResult() == GameLogic.GameResult.DRAW) {
-            if (bot != null) statistics.add("Draw with " + bot.getName());
-            else statistics.add("Draw");
-        } else if (game.getGameResult() == GameLogic.GameResult.X_WINS) {
-            if (bot != null) statistics.add("You win " + bot.getName());
-            else statistics.add("X win");
+        if (bot != null) {
+            if(bot instanceof HardBot) {
+                hardBotStatistics.add(game.getGameResult().toString());
+            } else {
+                simpleBotStatistics.add(game.getGameResult().toString());
+            }
         } else {
-            if (bot != null) statistics.add("You lose " + bot.getName());
-            else statistics.add("O win");
+            hotSeatStatistics.add(game.getGameResult().toString());
         }
-        statisticsText.setText(statistics.stream().reduce("\n", String::concat));
-        System.out.println(statistics.stream().reduce("\n", String::concat));
     }
 
     private void disableAll() {
@@ -165,8 +166,12 @@ public class Scenes {
         root.add(b, 1, pos);
     }
 
-    private void initializeMainMenuScene() {
-        GridPane root = new GridPane();
+    private void customizeStatButton(Button b, int pos, GridPane root) {
+        b.setPrefSize(200, 200);
+        root.add(b, 2, pos);
+    }
+
+    private void initializeGameButtons(GridPane root) {
         Button hotSeat = new Button();
         Button simpleBot = new Button();
         Button hardBot = new Button();
@@ -179,13 +184,35 @@ public class Scenes {
         simpleBot.setText("Game with easy bot");
         hardBot.setOnAction(e -> startNewGame(new HardBot()));
         hardBot.setText("Game with hard bot");
+    }
+
+    private void initializeStatisticsButtons(GridPane root) {
+        Button hotSeatStats = new Button();
+        Button simpleBotStats = new Button();
+        Button hardBotStats = new Button();
+        customizeStatButton(hotSeatStats, 0, root);
+        customizeStatButton(simpleBotStats, 1, root);
+        customizeStatButton(hardBotStats, 2, root);
+        hotSeatStats.setOnAction(e -> showAlert("Hot Seat Results",
+            hotSeatStatistics.stream().collect(Collectors.joining("\n"))));
+        hotSeatStats.setText("Stats");
+
+        simpleBotStats.setOnAction(e -> showAlert("Simple Bot Results",
+            simpleBotStatistics.stream().collect(Collectors.joining("\n"))));
+        simpleBotStats.setText("Stats");
+
+        hardBotStats.setOnAction(e -> showAlert("Hard Bot Results",
+            hardBotStatistics.stream().collect(Collectors.joining("\n"))));
+        hardBotStats.setText("Stats");
+    }
+
+    private void initializeMainMenuScene() {
+        GridPane root = new GridPane();
+        initializeGameButtons(root);
+        initializeStatisticsButtons(root);
         root.setPadding(new Insets(20));
         root.setHgap(25);
         root.setVgap(15);
-        if (statisticsText == null) {
-            statisticsText = new Text();
-        }
-        root.add(statisticsText, 1, 3);
         if (gameScene == null) {
             mainMenuScene = new Scene(root, 900, 900);
         } else {
