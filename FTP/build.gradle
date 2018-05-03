@@ -19,24 +19,3 @@ dependencies {
 
 mainClassName = 'ru.iisuslik.ftp.FTPServer'
 
-startScripts.enabled = false
-
-task server(type: CreateStartScripts) {
-    mainClassName = 'ru.iisuslik.ftp.FTPServer'
-    applicationName = 'server'
-    outputDir = new File(project.buildDir, 'tmp')
-    classpath = jar.outputs.files + project.configurations.runtime
-}
-
-task client(type: CreateStartScripts) {
-    mainClassName = 'ru.iisuslik.ftp.FTPClient'
-    applicationName = 'client'
-    outputDir = new File(project.buildDir, 'tmp')
-    classpath = jar.outputs.files + project.configurations.runtime
-}
-
-applicationDistribution.into('bin') {
-    from(client)
-    from(server)
-    fileMode = 0755
-}

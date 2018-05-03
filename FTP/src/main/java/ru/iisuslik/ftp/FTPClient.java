@@ -4,6 +4,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -73,16 +75,32 @@ public class FTPClient {
    * Download file from FTP server
    *
    * @param path file to download
-   * @return file's bytes
    * @throws IOException if there are some network problems
    */
-  public byte[] getFile(@NotNull String path) throws IOException {
+  public void getFile(@NotNull String path) throws IOException {
     sendRequest(2, path);
+    downloadFile(path);
+    System.out.println("Downloaded File " + path + " to local file " + fileName(path));
+  }
+
+  private String fileName(@NotNull String path) {
+    String[] arr = path.split("/");
+    return arr[arr.length - 1];
+  }
+
+  private void downloadFile(@NotNull String path) throws IOException {
+    String fileName = fileName(path);
     long size = in.readLong();
-    byte[] data = new byte[(int) size];
-    in.read(data);
-    System.out.println("Get file \"" + path + "\" with size " + size);
-    return data;
+    File fileToSave = new File(fileName);
+    fileToSave.createNewFile();
+    FileOutputStream fileOut = new FileOutputStream(fileToSave);
+    byte[] buffer = new byte[4096];
+    int read = 0;
+    while (size > 0 && (read = in.read(buffer)) != -1) {
+      fileOut.write(buffer, 0, read);
+      size -= read;
+    }
+    fileOut.close();
   }
 
   /**
@@ -111,7 +129,7 @@ public class FTPClient {
             System.out.println(client.getList(path));
             break;
           case 2:
-            System.out.println(new String(client.getFile(path)));
+            client.getFile(path);
             break;
         }
       }
