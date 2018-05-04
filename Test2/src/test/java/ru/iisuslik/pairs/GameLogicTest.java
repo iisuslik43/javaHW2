@@ -110,8 +110,12 @@ public class GameLogicTest {
       }
     }
     game.open(i1, j1);
-    game.open((i2 + 1) % N, j2);
+    i2 = (i2 + 1) % N;
+    if(game.getCell(i2, j2) == game.getCell(i1, j1)) {
+      i2 = (i2 + 1 % N);
+    }
+    game.open(i2, j2);
     assertFalse(game.isPressed(i1, j1));
-    assertFalse(game.isPressed((i2 + 1) % N, j2));
+    assertFalse(game.isPressed(i2, j2));
   }
 }
