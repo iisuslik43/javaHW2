@@ -5,18 +5,28 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
+/**
+ * Some tests for game logic
+ */
 public class GameLogicTest {
 
   private GameLogic game;
-  int N = 4;
+  private int N = 4;
 
+  /**
+   * Creates new game logic before every test
+   */
   @Before
   public void init() {
     game = new GameLogic(N);
   }
 
+  /**
+   * Checks that initialization is correct
+   */
   @Test
   public void initTest() {
+    assertEquals(N, game.getN());
     for (int i = 0; i < N; i++) {
       for (int j = 0; j < N; j++) {
         assertFalse(game.isPressed(i, j));
@@ -26,6 +36,9 @@ public class GameLogicTest {
     }
   }
 
+  /**
+   * Checks that only two cells with similar value were created
+   */
   @Test
   public void onlyTwo() {
     int[] counts = new int[N * N / 2];
@@ -40,20 +53,26 @@ public class GameLogicTest {
     }
   }
 
+  /**
+   * Checks that open works correctly
+   */
   @Test
   public void openWorks() {
     game.open(0, 0);
     assertTrue(game.isPressed(0, 0));
   }
 
+  /**
+   * Checks that if you open 2 similar cells it works
+   */
   @Test
   public void correctOpening() {
     int i1, j1, i2, j2;
     i1 = j1 = i2 = j2 = -1;
     for (int i = 0; i < N; i++) {
       for (int j = 0; j < N; j++) {
-        if(game.getCell(i, j) == 0) {
-          if(i1 == -1) {
+        if (game.getCell(i, j) == 0) {
+          if (i1 == -1) {
             i1 = i;
             j1 = j;
           } else {
@@ -69,14 +88,18 @@ public class GameLogicTest {
     assertTrue(game.isPressed(i2, j2));
   }
 
+
+  /**
+   * Checks that if you open 2 different cells it doesn't work
+   */
   @Test
   public void wrongOpening() {
     int i1, j1, i2, j2;
     i1 = j1 = i2 = j2 = -1;
     for (int i = 0; i < N; i++) {
       for (int j = 0; j < N; j++) {
-        if(game.getCell(i, j) == 0) {
-          if(i1 == -1) {
+        if (game.getCell(i, j) == 0) {
+          if (i1 == -1) {
             i1 = i;
             j1 = j;
           } else {
@@ -91,14 +114,4 @@ public class GameLogicTest {
     assertFalse(game.isPressed(i1, j1));
     assertFalse(game.isPressed((i2 + 1) % N, j2));
   }
-
-  private void print(GameLogic game) {
-    for (int i = 0; i < N; i++) {
-      for (int j = 0; j < N; j++) {
-        System.out.print(game.getCell(i, j) + " ");
-      }
-      System.out.println();
-    }
-  }
-
 }

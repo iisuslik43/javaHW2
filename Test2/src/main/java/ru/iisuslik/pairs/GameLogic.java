@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 /**
- * 
+ * Class for game logic of Pairs
  */
 public class GameLogic {
   private int[][] field;
@@ -14,6 +14,11 @@ public class GameLogic {
   private int jPrev = -1;
   private int restCells;
 
+  /**
+   * Creates new game logic
+   *
+   * @param size field size
+   */
   public GameLogic(int size) {
     N = size;
     field = new int[N][N];
@@ -57,18 +62,38 @@ public class GameLogic {
     }
   }
 
+  /**
+   * Get content of cell
+   *
+   * @return i j cell value
+   */
   public int getCell(int i, int j) {
     return field[i][j];
   }
 
+  /**
+   * Get is button pressed
+   *
+   * @return true if this button is pressed
+   */
   public boolean isPressed(int i, int j) {
     return pressed[i][j];
   }
 
+  /**
+   * Get field size
+   *
+   * @return size
+   */
   public int getN() {
     return N;
   }
 
+  /**
+   * Get is game over
+   *
+   * @return true if game is over
+   */
   public boolean gameOver() {
     return restCells == 0;
   }

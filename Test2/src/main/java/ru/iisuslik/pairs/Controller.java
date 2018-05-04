@@ -20,7 +20,7 @@ public class Controller {
   /**
    * Creates new controller
    *
-   * @param N field size
+   * @param N            field size
    * @param primaryStage primary stage
    */
   public Controller(int N, Stage primaryStage) {
@@ -50,7 +50,7 @@ public class Controller {
     buttons[i][j].setText(String.valueOf(game.getCell(i, j)));
     buttons[i][j].setDisable(true);
     game.open(i, j);
-    if(game.gameOver()) {
+    if (game.gameOver()) {
       showAlert("Game Over", "Bye");
       System.exit(0);
     }
@@ -59,7 +59,7 @@ public class Controller {
   /**
    * Shows alert that waits that user will press OK
    *
-   * @param title alert title
+   * @param title   alert title
    * @param content alert content
    */
   public static void showAlert(String title, String content) {
@@ -75,7 +75,7 @@ public class Controller {
     for (int i = 0; i < N; i++) {
       for (int j = 0; j < N; j++) {
         Button b = buttons[i][j];
-        if(game.isPressed(i, j)) {
+        if (game.isPressed(i, j)) {
           b.setText(String.valueOf(game.getCell(i, j)));
           b.setDisable(true);
         } else {
