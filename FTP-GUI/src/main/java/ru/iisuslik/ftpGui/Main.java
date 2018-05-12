@@ -5,7 +5,15 @@ import javafx.stage.Stage;
 
 import java.util.List;
 
+/**
+ * Main class for FTP-GUI
+ */
 public class Main extends Application {
+  /**
+   * Starts application
+   *
+   * @param stage primary stage
+   */
   @Override
   public void start(Stage stage) {
     List<String> list = getParameters().getRaw();
@@ -20,6 +28,8 @@ public class Main extends Application {
   }
 
   /**
+   * Starts application with 2 args - host and port
+   *
    * @param args first argument should be server's host and second - server's port
    */
   public static void main(String[] args) {
