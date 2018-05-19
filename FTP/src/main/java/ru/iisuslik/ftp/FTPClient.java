@@ -80,7 +80,6 @@ public class FTPClient {
   public void getFile(@NotNull String path) throws IOException {
     sendRequest(2, path);
     downloadFile(path);
-    System.out.println("Downloaded File " + path + " to local file " + fileName(path));
   }
 
   private String fileName(@NotNull String path) {
@@ -91,6 +90,10 @@ public class FTPClient {
   private void downloadFile(@NotNull String path) throws IOException {
     String fileName = fileName(path);
     long size = in.readLong();
+    if (size == 0) {
+      System.out.println("You tried to download directory " + fileName);
+      return;
+    }
     File fileToSave = new File(fileName);
     fileToSave.createNewFile();
     FileOutputStream fileOut = new FileOutputStream(fileToSave);
@@ -101,6 +104,7 @@ public class FTPClient {
       size -= read;
     }
     fileOut.close();
+    System.out.println("Downloaded File " + path + " to local file " + fileName(path));
   }
 
   /**
@@ -117,25 +121,37 @@ public class FTPClient {
     } catch (IOException e) {
       System.out.println("Can't connect to server: " + e.getMessage());
       return;
+    } catch (ArrayIndexOutOfBoundsException e) {
+      System.out.println("Choose server host as a first argument and server port as a second argument");
+      return;
     }
     Scanner in = new Scanner(System.in);
+    printHelp();
     try {
       while (true) {
-        int type = in.nextInt();
+        String command = in.next();
         String path = in.next();
-        System.out.println("Send request with type # " + type);
-        switch (type) {
-          case 1:
+        System.out.println("Send " + command + " request");
+        switch (command) {
+          case "list":
             System.out.println(client.getList(path));
             break;
-          case 2:
+          case "download":
             client.getFile(path);
+            break;
+          default:
+            printHelp();
             break;
         }
       }
     } catch (IOException e) {
       System.out.println("Can't reach server: " + e.getMessage());
     }
+  }
+
+  private static void printHelp() {
+    System.out.println("Use <list dirPath> to get list of files in dir");
+    System.out.println("Use <download filePath> to download file");
   }
 
 

@@ -37,6 +37,7 @@ public class FTPServer {
    * Starts server, it will be waiting for clients
    */
   public void start() {
+    System.out.println("Server starts working");
     while (true) {
       try {
         Socket socket = server.accept();
@@ -125,6 +126,8 @@ public class FTPServer {
       server.start();
     } catch (IOException e) {
       System.out.println("Can't create server: " + e.getMessage());
+    } catch (ArrayIndexOutOfBoundsException e) {
+      System.out.println("Choose server port as a first argument");
     }
 
   }
