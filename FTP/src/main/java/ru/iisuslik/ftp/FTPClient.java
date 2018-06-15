@@ -91,7 +91,7 @@ public class FTPClient {
     String fileName = fileName(path);
     long size = in.readLong();
     if (size == 0) {
-      System.out.println("You tried to download directory " + fileName);
+      System.out.println("You tried to download directory or file \"" + fileName + "\" doesn't exist ");
       return;
     }
     File fileToSave = new File(fileName);

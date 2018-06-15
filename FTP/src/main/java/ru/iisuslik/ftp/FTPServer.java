@@ -56,16 +56,25 @@ public class FTPServer {
     String path = in.readUTF();
     System.out.println("Get request to get file \"" + path + '\"');
     File file = new File(path);
+    if (!file.exists()) {
+      System.out.println('\"' + path + "\" doesn't exists");
+      out.writeLong(0);
+      return;
+    }
     if (file.isDirectory()) {
       System.out.println('\"' + path + "\" is a directory");
       out.writeLong(0);
       return;
     }
     out.writeLong(file.length());
-    FileInputStream fis = new FileInputStream(file);
     byte[] data = new byte[(int) file.length()];
-    fis.read(data);
-    fis.close();
+    try(FileInputStream fis = new FileInputStream(file)) {
+      fis.read(data);
+    } catch (IOException e) {
+      System.out.println("Can't open \"" + path + "\"");
+      out.writeLong(0);
+      return;
+    }
     out.write(data);
     out.flush();
     System.out.println("Response for get file request was sent");
@@ -76,6 +85,11 @@ public class FTPServer {
     String path = in.readUTF();
     System.out.println("Get request to list files in directory \"" + path + '\"');
     File dir = new File(path);
+    if (!dir.exists()) {
+      System.out.println('\"' + path + "\" doesn't exists");
+      out.writeInt(0);
+      return;
+    }
     if (!dir.isDirectory()) {
       System.out.println('\"' + path + "\" is not a directory");
       out.writeInt(0);
@@ -128,6 +142,8 @@ public class FTPServer {
       System.out.println("Can't create server: " + e.getMessage());
     } catch (ArrayIndexOutOfBoundsException e) {
       System.out.println("Choose server port as a first argument");
+    } catch (NumberFormatException e) {
+      System.out.println("First argument should be port - integer number");
     }
 
   }
