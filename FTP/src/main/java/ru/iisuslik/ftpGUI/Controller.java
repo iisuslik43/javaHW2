@@ -1,6 +1,11 @@
 package ru.iisuslik.ftpGUI;
 
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.Scene;
@@ -8,13 +13,20 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import org.jetbrains.annotations.NotNull;
 import ru.iisuslik.ftp.FTPClient;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Observable;
 
 import static ru.iisuslik.ftp.FTPClient.FTPFile;
 
@@ -24,9 +36,9 @@ import static ru.iisuslik.ftp.FTPClient.FTPFile;
 public class Controller {
 
   private FTPClient client;
-  private GridPane root;
-  private ArrayList<Button> buttons = new ArrayList<>();
   private String curPath = "./";
+  private TableView<FTPFile> table;
+  private Stage primaryStage;
 
   /**
    * Shows alert that waits that user will press OK
@@ -50,6 +62,7 @@ public class Controller {
    * @param primaryStage stage where all panes should be put on
    */
   public Controller(String host, int port, Stage primaryStage) {
+    this.primaryStage = primaryStage;
     try {
       client = new FTPClient(host, port);
     } catch (IOException e) {
@@ -66,22 +79,60 @@ public class Controller {
     splitPane.setOrientation(Orientation.VERTICAL);
     ScrollPane sp = new ScrollPane();
     sp.setFitToWidth(true);
-    root = new GridPane();
-    sp.setContent(root);
     Button update = initializeUpdateButton();
     splitPane.getItems().addAll(update, sp);
-    initializeBackButton();
+
+    initializeTable();
+
+    sp.setContent(table);
+
     update();
-    root.setPadding(new Insets(20));
-    root.setHgap(300);
-    root.setVgap(10);
     return new Scene(splitPane, 900, 900);
   }
 
-  private void customizeButton(Button button) {
-    button.setPrefSize(400, 100);
-    button.setStyle("-fx-font: 30 arial; -fx-base: #b6e7c9;");
+  private void initializeTable() {
+    table = new TableView<>();
+    table.setEditable(true);
+    TableColumn fileNameCol = new TableColumn("File Name");
+    fileNameCol.setMinWidth(500);
+    table.setMinHeight(500);
+    fileNameCol.setCellValueFactory(
+        new PropertyValueFactory<FTPFile, String>("name"));
+    TableColumn isDirectoryCol = new TableColumn("Directory");
+    isDirectoryCol.setMinWidth(100);
+    isDirectoryCol.setCellValueFactory(
+        new PropertyValueFactory<FTPFile, String>("isDirectory"));
+    table.getColumns().addAll(fileNameCol, isDirectoryCol);
+
+    table.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<FTPFile>() {
+      @Override
+      public void changed(ObservableValue<? extends FTPFile> observableValue, FTPFile ftpFile, FTPFile file) {
+        if (file == null) {
+          return;
+        }
+        if (file.getIsDirectory()) {
+          if (file.getName().equals("../")) {
+            goBack();
+            return;
+          }
+          curPath += file.getName() + "/";
+          update();
+        } else {
+          FileChooser fileChooser = new FileChooser();
+          fileChooser.setTitle("Save File");
+          File fileToSave = fileChooser.showSaveDialog(primaryStage);
+          if (fileToSave != null) {
+            try {
+              client.getFile(curPath + file.getName(), fileToSave.getPath());
+            } catch (IOException exception) {
+              showAlert("ERROR", "Can't download file");
+            }
+          }
+        }
+      }
+    });
   }
+
 
   private Button initializeUpdateButton() {
     Button update = new Button();
@@ -89,17 +140,9 @@ public class Controller {
     update.setStyle("-fx-font: 15 arial; -fx-base: #b6e7c9;");
     update.setText("Update");
     update.setOnAction(e -> update());
-    root.add(update, 1, 0);
     return update;
   }
 
-  private void initializeBackButton() {
-    Button back = new Button();
-    customizeButton(back);
-    back.setText("/..");
-    back.setOnAction(e -> goBack());
-    root.add(back, 0, 0);
-  }
 
   private void goBack() {
     if (!curPath.equals("./")) {
@@ -114,42 +157,23 @@ public class Controller {
   }
 
   private void update() {
-    ArrayList<Button> newButtons = new ArrayList<>();
-    List<FTPFile> files;
+    List<FTPFile> files = new ArrayList<>();
+    files.add(new FTPFile("../", true));
     try {
-      files = client.getList(curPath);
+      files.addAll(client.getList(curPath));
     } catch (IOException e) {
       showAlert("ERROR", "Can't get list of file in this directory");
       return;
     }
-    for (FTPFile file : files) {
-      Button b = new Button();
-      customizeButton(b);
-      if (file.isDirectory) {
-        b.setText("/" + file.name);
-        b.setOnAction(e -> {
-          curPath += file.name + "/";
-          update();
-        });
-      } else {
-        b.setText(file.name);
-        b.setOnAction(e -> {
-          try {
-            client.getFile(curPath + file.name);
-          } catch (IOException exception) {
-            showAlert("ERROR", "Can't download file");
-          }
-        });
-      }
-      newButtons.add(b);
-    }
+    table.setItems(FXCollections.observableList(files));
+  }
 
-    for (Button button : buttons) {
-      root.getChildren().remove(button);
+  private void downloadFile(@NotNull String path) throws IOException {
+    FileChooser fileChooser = new FileChooser();
+    fileChooser.setTitle("Save Image");
+    File fileToSave = fileChooser.showSaveDialog(primaryStage);
+    if (fileToSave != null) {
+      client.getFile(path, fileToSave.getPath());
     }
-    for (int i = 0; i < newButtons.size(); i++) {
-      root.add(newButtons.get(i), 0, i + 1);
-    }
-    buttons = newButtons;
   }
 }

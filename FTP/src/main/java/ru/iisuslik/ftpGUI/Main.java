@@ -22,7 +22,7 @@ public class Main extends Application {
       int port = Integer.parseInt(list.get(1));
       new Controller(host, port, stage);
     } catch (Exception e) {
-      Controller.showAlert("ERROR", "Incorrect args");
+      Controller.showAlert("ERROR", "Incorrect args" + e.getMessage());
       System.exit(1);
     }
   }

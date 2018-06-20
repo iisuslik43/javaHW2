@@ -1,5 +1,7 @@
 package ru.iisuslik.ftp;
 
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleStringProperty;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.DataInputStream;
@@ -74,12 +76,13 @@ public class FTPClient {
   /**
    * Download file from FTP server
    *
-   * @param path file to download
+   * @param path            file from server to download
+   * @param destinationPath file in client to save
    * @throws IOException if there are some network problems
    */
-  public void getFile(@NotNull String path) throws IOException {
+  public void getFile(@NotNull String path, @NotNull String destinationPath) throws IOException {
     sendRequest(2, path);
-    downloadFile(path);
+    downloadFile(path, destinationPath);
   }
 
   private String fileName(@NotNull String path) {
@@ -87,14 +90,14 @@ public class FTPClient {
     return arr[arr.length - 1];
   }
 
-  private void downloadFile(@NotNull String path) throws IOException {
+  private void downloadFile(@NotNull String path, @NotNull String destinationPath) throws IOException {
     String fileName = fileName(path);
     long size = in.readLong();
     if (size == 0) {
-      System.out.println("You tried to download directory " + fileName);
+      System.out.println("You tried to download directory or file \"" + fileName + "\" doesn't exist ");
       return;
     }
-    File fileToSave = new File(fileName);
+    File fileToSave = new File(destinationPath);
     fileToSave.createNewFile();
     FileOutputStream fileOut = new FileOutputStream(fileToSave);
     byte[] buffer = new byte[4096];
@@ -137,7 +140,7 @@ public class FTPClient {
             System.out.println(client.getList(path));
             break;
           case "download":
-            client.getFile(path);
+            client.getFile(path, "./" + path);
             break;
           default:
             printHelp();
@@ -163,12 +166,28 @@ public class FTPClient {
     /**
      * file name
      */
-    public String name;
+    private SimpleStringProperty name;
+
+
+    public String getName() {
+      return name.get();
+    }
+    public void setName(String fName) {
+      name.set(fName);
+    }
+
+    public boolean getIsDirectory() {
+      return isDirectory.get();
+    }
+
+    public void setIsDirectory(boolean isDir) {
+      isDirectory.set(isDir);
+    }
 
     /**
      * It's true if file is actually a directory
      */
-    public boolean isDirectory;
+    private SimpleBooleanProperty isDirectory;
 
     /**
      * Creates new file representation
@@ -177,13 +196,13 @@ public class FTPClient {
      * @param isDirectory is this file a directory
      */
     public FTPFile(@NotNull String name, boolean isDirectory) {
-      this.name = name;
-      this.isDirectory = isDirectory;
+      this.name = new SimpleStringProperty(name);
+      this.isDirectory = new SimpleBooleanProperty(isDirectory);
     }
 
     @Override
     public String toString() {
-      return (isDirectory ? "dir " : "file ") + name;
+      return (getIsDirectory() ? "dir " : "file ") + name;
     }
 
     @Override
