@@ -3,6 +3,7 @@ package ru.iisuslik.xunit;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -25,9 +26,19 @@ public class XUnitTest {
    */
   @Test
   public void failed() {
-    XUnit.TestsResult res = XUnit.runTests("src/test/resources/ru/iisuslik/xunit/FailedTest.class",
+    XUnit.TestsResult res = XUnit.runTests("src/test/resources/FailedTest.class",
         "ru.iisuslik.xunit.FailedTest");
     assertResult(1, 0, 0, res);
+  }
+
+  /**
+   * Runs tests in file with incorrect 2 annotations
+   */
+  @Test
+  public void twoAnnotations() {
+    XUnit.TestsResult res = XUnit.runTests("src/test/resources/TwoAnnotationsTest.class",
+        "ru.iisuslik.xunit.TwoAnnotationsTest");
+    assertNull(res);
   }
 
   /**
@@ -35,7 +46,7 @@ public class XUnitTest {
    */
   @Test
   public void success() {
-    XUnit.TestsResult res = XUnit.runTests("src/test/resources/ru/iisuslik/xunit/SuccessfulTest.class",
+    XUnit.TestsResult res = XUnit.runTests("src/test/resources/SuccessfulTest.class",
         "ru.iisuslik.xunit.SuccessfulTest");
     assertResult(1, 1, 0, res);
   }
@@ -45,7 +56,7 @@ public class XUnitTest {
    */
   @Test
   public void all() {
-    XUnit.TestsResult res = XUnit.runTests("src/test/resources/ru/iisuslik/xunit/AllTests.class",
+    XUnit.TestsResult res = XUnit.runTests("src/test/resources/AllTests.class",
         "ru.iisuslik.xunit.AllTests");
     assertResult(4, 2, 1, res);
   }
@@ -55,7 +66,7 @@ public class XUnitTest {
    */
   @Test
   public void before() {
-    XUnit.TestsResult res = XUnit.runTests("src/test/resources/ru/iisuslik/xunit/BeforeTest.class",
+    XUnit.TestsResult res = XUnit.runTests("src/test/resources/BeforeTest.class",
         "ru.iisuslik.xunit.BeforeTest");
     assertResult(1, 1, 0, res);
   }
@@ -65,7 +76,7 @@ public class XUnitTest {
    */
   @Test
   public void after() {
-    XUnit.TestsResult res = XUnit.runTests("src/test/resources/ru/iisuslik/xunit/AfterTest.class",
+    XUnit.TestsResult res = XUnit.runTests("src/test/resources/AfterTest.class",
         "ru.iisuslik.xunit.AfterTest");
     assertResult(1, 1, 0, res);
     assertTrue(ru.iisuslik.xunit.AfterTest.after);

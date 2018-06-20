@@ -28,7 +28,7 @@ public class XUnit {
   private int ignoredTestsCount = 0;
 
 
-  private XUnit(@NotNull Class<?> testClass) {
+  private XUnit(@NotNull Class<?> testClass) throws TwoAnnotationsException {
     try {
       instance = testClass.newInstance();
     } catch (InstantiationException e) {
@@ -38,6 +38,7 @@ public class XUnit {
     }
     initialize();
     addMethodsToLists(testClass);
+
   }
 
   private static void printError(String message, Throwable e) {
@@ -56,13 +57,17 @@ public class XUnit {
     }
   }
 
-  private void addMethodsToLists(Class<?> testClass) {
+  private void addMethodsToLists(Class<?> testClass) throws TwoAnnotationsException {
     for (Method method : testClass.getDeclaredMethods()) {
+      boolean thereIsTest = false;
       for (Annotation a : method.getAnnotations()) {
         if (annotations.contains(a.annotationType())) {
           methods.get(a.annotationType()).add(method);
           if (a.annotationType().equals(Test.class)) {
+            thereIsTest = true;
             testsCount++;
+          } else if (thereIsTest) {
+            throw new TwoAnnotationsException(a.toString());
           }
         }
       }
@@ -162,6 +167,8 @@ public class XUnit {
       printError("There is no such class", e);
     } catch (ArrayIndexOutOfBoundsException e) {
       System.err.println("First argument should be path to test .class file, second - class.package.className");
+    } catch (TwoAnnotationsException e) {
+      System.out.println("You tried to use " + e.getMessage() + " with @Test in one method");
     }
     return null;
   }
