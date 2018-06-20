@@ -6,6 +6,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.Scene;
@@ -16,6 +17,7 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -103,41 +105,38 @@ public class Controller {
     isDirectoryCol.setCellValueFactory(
         new PropertyValueFactory<FTPFile, String>("isDirectory"));
     table.getColumns().addAll(fileNameCol, isDirectoryCol);
-
-    table.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<FTPFile>() {
-      @Override
-      public void changed(ObservableValue<? extends FTPFile> observableValue, FTPFile ftpFile, FTPFile file) {
-        if (file == null) {
+    table.setOnMouseClicked(mouseEvent -> {
+      FTPFile file = table.getSelectionModel().getSelectedItem();
+      if (file == null || mouseEvent.getClickCount() != 2) {
+        return;
+      }
+      if (file.getIsDirectory()) {
+        if (file.getName().equals("../")) {
+          goBack();
           return;
         }
-        if (file.getIsDirectory()) {
-          if (file.getName().equals("../")) {
-            goBack();
-            return;
-          }
-          curPath += file.getName() + "/";
-          update();
-        } else {
-          FileChooser fileChooser = new FileChooser();
-          fileChooser.setTitle("Save File");
-          File fileToSave = fileChooser.showSaveDialog(primaryStage);
-          if (fileToSave != null) {
-            try {
-              client.getFile(curPath + file.getName(), fileToSave.getPath());
-            } catch (IOException exception) {
-              showAlert("ERROR", "Can't download file");
-            }
+        curPath += file.getName() + "/";
+        update();
+      } else {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save File");
+        File fileToSave = fileChooser.showSaveDialog(primaryStage);
+        if (fileToSave != null) {
+          try {
+            client.getFile(curPath + file.getName(), fileToSave.getPath());
+          } catch (IOException exception) {
+            showAlert("ERROR", "Can't download file");
           }
         }
       }
     });
+
   }
 
 
   private Button initializeUpdateButton() {
     Button update = new Button();
-    update.setPrefSize(900, 100);
-    update.setStyle("-fx-font: 15 arial; -fx-base: #b6e7c9;");
+    update.setPrefSize(900, 50);
     update.setText("Update");
     update.setOnAction(e -> update());
     return update;

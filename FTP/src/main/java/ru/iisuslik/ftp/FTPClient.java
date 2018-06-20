@@ -169,19 +169,18 @@ public class FTPClient {
     private SimpleStringProperty name;
 
 
+    /**
+     * name getter
+     */
     public String getName() {
       return name.get();
     }
-    public void setName(String fName) {
-      name.set(fName);
-    }
 
+    /**
+     * is directory getter
+     */
     public boolean getIsDirectory() {
       return isDirectory.get();
-    }
-
-    public void setIsDirectory(boolean isDir) {
-      isDirectory.set(isDir);
     }
 
     /**
@@ -209,7 +208,7 @@ public class FTPClient {
     public boolean equals(Object o) {
       if (o instanceof FTPFile) {
         FTPFile other = ((FTPFile) o);
-        return name.equals(other.name) && isDirectory == other.isDirectory;
+        return getName().equals(other.getName()) && getIsDirectory() == other.getIsDirectory();
       }
       return false;
     }
