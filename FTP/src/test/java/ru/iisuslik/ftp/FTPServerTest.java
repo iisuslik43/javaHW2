@@ -127,8 +127,8 @@ public class FTPServerTest {
     DataInputStream in = new DataInputStream(new ByteArrayInputStream(data));
     assertEquals(files.size(), in.readInt());
     for (FTPClient.FTPFile file : files) {
-      assertEquals(file.name, in.readUTF());
-      assertEquals(file.isDirectory, in.readBoolean());
+      assertEquals(file.getName(), in.readUTF());
+      assertEquals(file.getIsDirectory(), in.readBoolean());
     }
   }
 

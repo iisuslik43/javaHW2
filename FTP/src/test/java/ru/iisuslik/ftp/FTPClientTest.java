@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.net.Socket;
 import java.nio.file.Files;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import ru.iisuslik.ftp.FTPClient.FTPFile;
 
@@ -27,7 +28,7 @@ public class FTPClientTest {
   public void listFiles() throws Exception {
     Socket s = mock(Socket.class);
     ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-    List<FTPFile> res = Arrays.asList(new FTPFile("file", false));
+    List<FTPFile> res = Collections.singletonList(new FTPFile("file", false));
     when(s.getInputStream()).thenReturn(getInputStreamWithList(res));
     when(s.getOutputStream()).thenReturn(byteOut);
     FTPClient client = new FTPClient(s);
@@ -46,7 +47,7 @@ public class FTPClientTest {
     ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
     when(s.getOutputStream()).thenReturn(byteOut);
     FTPClient client = new FTPClient(s);
-    client.getFile("file");
+    client.getFile("file", "file");
     File withData = new File("file");
     assertEquals("data", Files.lines(withData.toPath()).findFirst().get());
     assertEqualsRequests(2, "file", byteOut.toByteArray());
@@ -58,8 +59,8 @@ public class FTPClientTest {
     DataOutputStream out = new DataOutputStream(o);
     out.writeInt(files.size());
     for (FTPFile file : files) {
-      out.writeUTF(file.name);
-      out.writeBoolean(file.isDirectory);
+      out.writeUTF(file.getName());
+      out.writeBoolean(file.getIsDirectory());
     }
     return new ByteArrayInputStream(o.toByteArray());
   }
